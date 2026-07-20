@@ -1,0 +1,31 @@
+# Build directories
+build/
+bin/
+obj/
+out/
+.cmake/
+
+# Persistence data (don't commit local DB)
+data/*.json
+!data/.keep
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.user
+
+# Compiled object files
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# OS generated files
+.DS_Store
+Thumbs.db
