@@ -116,6 +116,9 @@ void ATMController::run() {
             case ScreenState::ADMIN_LOGS:
                 handleAdminLogs();
                 break;
+            case ScreenState::CHECK_STATUS:
+                handleCheckStatus();
+                break;
             case ScreenState::LOGOUT:
                 Animations::cardEjectAnimation();
                 TerminalUI::showSuccess("Logged out successfully");
@@ -143,10 +146,12 @@ void ATMController::handleWelcome() {
     char ch = TerminalUI::getKeyPress();
     if (ch == 'a' || ch == 'A') {
         changeState(ScreenState::ADMIN_LOGIN);
-    } else if (ch == 'c' || ch == 'C') {
+    } else if (ch == '2' || ch == 'c' || ch == 'C') {
         changeState(ScreenState::APPLY_ACCOUNT);
-    } else if (ch == 'q' || ch == 'Q') {
-        changeState(ScreenState::EXIT); // Hidden exit for testing
+    } else if (ch == '3' || ch == 's' || ch == 'S') {
+        changeState(ScreenState::CHECK_STATUS);
+    } else if (ch == 'q' || ch == 'Q' || ch == '0') {
+        changeState(ScreenState::EXIT);
     } else {
         changeState(ScreenState::INSERT_CARD);
     }
@@ -401,6 +406,11 @@ void ATMController::handleAdminUserSearch() {
 void ATMController::handleAdminLogs() {
     screenManager_.renderAdminLogs();
     changeState(ScreenState::ADMIN_DASHBOARD);
+}
+
+void ATMController::handleCheckStatus() {
+    screenManager_.renderCheckStatus();
+    changeState(ScreenState::WELCOME);
 }
 
 } // namespace atmverse

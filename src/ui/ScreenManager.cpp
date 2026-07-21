@@ -307,42 +307,40 @@ void ScreenManager::renderAdminCash() {
 }
 
 void ScreenManager::renderApplyAccount() {
-    drawBaseScreen("OPEN NEW ACCOUNT", "Fill in your details");
+    drawBaseScreen("OPEN NEW ACCOUNT");
 
-    TerminalUI::drawBox(8, 9, 44, 16, theme::NEON_BLUE, true);
+    TerminalUI::drawBox(4, 7, 52, 12, theme::CYAN, true);
+    TerminalUI::moveCursor(8, 6);
+    std::cout << theme::CYAN << theme::BOLD << "Account Application Form" << theme::RESET;
+    TerminalUI::moveCursor(9, 6);
+    std::cout << theme::DARK_GRAY << "Type '0' at any prompt to cancel." << theme::RESET;
 
-    TerminalUI::moveCursor(10, 10);
-    std::cout << theme::CYAN << theme::BOLD << "  Account Application Form" << theme::RESET;
-    TerminalUI::drawLine(10, 11, 40, theme::DARK_GRAY);
+    std::string name = TerminalUI::getInput("Full Name : ", 6, 11);
+    if (name.empty() || name == "0") return;
 
-    std::string name  = TerminalUI::getInput("Full Name : ", 10, 13);
-    std::string phone = TerminalUI::getInput("Phone     : ", 10, 15);
-    std::string email = TerminalUI::getInput("Email     : ", 10, 17);
+    std::string phone = TerminalUI::getInput("Phone No  : ", 6, 12);
+    if (phone.empty() || phone == "0") return;
 
-    // Account type selection
-    TerminalUI::moveCursor(19, 10);
+    std::string email = TerminalUI::getInput("Email     : ", 6, 13);
+    if (email.empty() || email == "0") return;
+
+    TerminalUI::moveCursor(15, 6);
     std::cout << theme::CYAN << "Account Type:" << theme::RESET;
-    TerminalUI::drawBox(10, 20, 18, 3, theme::NEON_GREEN);
-    TerminalUI::drawText(12, 21, theme::WHITE + "1. Savings");
-    TerminalUI::drawBox(30, 20, 18, 3, theme::NEON_GREEN);
-    TerminalUI::drawText(32, 21, theme::WHITE + "2. Current");
-
-    int typeChoice = TerminalUI::getMenuChoice(1, 2, 20, 23);
+    TerminalUI::moveCursor(16, 8);
+    std::cout << theme::WHITE << "1. Savings   2. Current";
+    int typeChoice = TerminalUI::getMenuChoice(1, 2, 6, 17);
     std::string accountType = (typeChoice == 2) ? "Current" : "Savings";
 
     // PIN setup
     drawBaseScreen("SET YOUR PIN", "Choose a 4-digit PIN");
     TerminalUI::drawBox(14, 12, 32, 7, theme::NEON_BLUE, true);
     std::string pin1 = TerminalUI::getMaskedInput("Set PIN    : ", 4, 16, 14);
+    if (pin1 == "0") return;
     std::string pin2 = TerminalUI::getMaskedInput("Confirm PIN: ", 4, 16, 16);
+    if (pin2 == "0") return;
 
     if (pin1 != pin2 || pin1.length() != 4) {
         TerminalUI::showError("PINs do not match or invalid length!");
-        return;
-    }
-
-    if (name.empty() || phone.empty() || email.empty()) {
-        TerminalUI::showError("All fields are required!");
         return;
     }
 
@@ -358,9 +356,9 @@ void ScreenManager::renderApplyAccount() {
         TerminalUI::moveCursor(15, 12);
         std::cout << theme::WHITE << "  admin approval." << theme::RESET;
         TerminalUI::moveCursor(17, 12);
-        std::cout << theme::GRAY << "  You will receive your" << theme::RESET;
+        std::cout << theme::GRAY << "  Check status from Welcome" << theme::RESET;
         TerminalUI::moveCursor(18, 12);
-        std::cout << theme::GRAY << "  Card Number upon approval." << theme::RESET;
+        std::cout << theme::GRAY << "  screen to get your Card No." << theme::RESET;
         TerminalUI::waitForKey();
     } else {
         TerminalUI::showError("Failed to submit application!");
@@ -503,6 +501,52 @@ void ScreenManager::renderAdminLogs() {
         std::cout << color << "[" << timestamp << "] " << theme::WHITE << type;
         TerminalUI::moveCursor(y++, 8);
         std::cout << theme::GRAY << "User: " << userId << " | " << details << theme::RESET;
+    }
+
+    TerminalUI::waitForKey();
+}
+
+void ScreenManager::renderCheckStatus() {
+    drawBaseScreen("APPLICATION STATUS");
+    
+    TerminalUI::moveCursor(8, 6);
+    std::cout << theme::CYAN << "Enter your Request ID or Phone Number" << theme::RESET;
+    
+    std::string query = TerminalUI::getInput("> ", 6, 10);
+    if (query.empty() || query == "0" || util::toLower(query) == "cancel") return;
+
+    AccountRequest* req = bankSystem_->checkRequestStatus(query);
+
+    drawBaseScreen("STATUS RESULT");
+
+    if (!req) {
+        TerminalUI::drawCenteredColored(12, "No application found for: " + query, theme::RED, theme::ATM_WIDTH);
+        TerminalUI::waitForKey();
+        return;
+    }
+
+    TerminalUI::drawBox(4, 8, 52, 9, theme::CYAN, true);
+    TerminalUI::moveCursor(10, 6);
+    std::cout << theme::WHITE << "Name     : " << theme::GRAY << req->getName();
+    TerminalUI::moveCursor(11, 6);
+    std::cout << theme::WHITE << "Status   : ";
+    
+    if (req->getStatus() == RequestStatus::PENDING) {
+        std::cout << theme::GOLD << "PENDING APPROVAL";
+        TerminalUI::moveCursor(13, 6);
+        std::cout << theme::DARK_GRAY << "Your account is still under review.";
+    } else if (req->getStatus() == RequestStatus::REJECTED) {
+        std::cout << theme::RED << "REJECTED";
+        TerminalUI::moveCursor(13, 6);
+        std::cout << theme::DARK_GRAY << "Your application was not approved.";
+    } else {
+        std::cout << theme::NEON_GREEN << "APPROVED";
+        TerminalUI::moveCursor(13, 6);
+        std::cout << theme::CYAN << "Account  : " << theme::WHITE << req->getAssignedAccountNumber();
+        TerminalUI::moveCursor(14, 6);
+        std::cout << theme::CYAN << "Card No  : " << theme::WHITE << req->getAssignedCardNumber();
+        TerminalUI::moveCursor(16, 6);
+        std::cout << theme::GOLD << "Please copy your Card No to login!";
     }
 
     TerminalUI::waitForKey();

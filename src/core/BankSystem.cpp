@@ -359,6 +359,11 @@ bool BankSystem::approveRequest(const std::string& requestId) {
                               account, card);
 
             customers_.push_back(customer);
+            
+            // Set the assigned identifiers in the request
+            req.setAssignedAccountNumber(accNum);
+            req.setAssignedCardNumber(cardNum);
+
             buildIndices();
             saveAll();
 
@@ -380,6 +385,15 @@ bool BankSystem::rejectRequest(const std::string& requestId) {
         }
     }
     return false;
+}
+
+AccountRequest* BankSystem::checkRequestStatus(const std::string& query) {
+    for (auto& req : accountRequests_) {
+        if (req.getRequestId() == query || req.getPhone() == query) {
+            return &req;
+        }
+    }
+    return nullptr;
 }
 
 } // namespace atmverse

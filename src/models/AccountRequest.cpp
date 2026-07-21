@@ -21,6 +21,8 @@ json AccountRequest::toJson() const {
     j["pinSalt"] = pinSalt_;
     j["accountType"] = accountType_;
     j["timestamp"] = timestamp_;
+    j["assignedCardNumber"] = assignedCardNumber_;
+    j["assignedAccountNumber"] = assignedAccountNumber_;
     
     switch (status_) {
         case RequestStatus::PENDING: j["status"] = "PENDING"; break;
@@ -39,6 +41,8 @@ void AccountRequest::fromJson(const json& j) {
     pinSalt_ = j.value("pinSalt", "");
     accountType_ = j.value("accountType", "Savings");
     timestamp_ = j.value("timestamp", "");
+    assignedCardNumber_ = j.value("assignedCardNumber", "");
+    assignedAccountNumber_ = j.value("assignedAccountNumber", "");
 
     std::string statStr = j.value("status", "PENDING");
     if (statStr == "APPROVED") status_ = RequestStatus::APPROVED;

@@ -40,6 +40,7 @@ private:
     void handleAdminUserSearch();
     void handleAdminLogs();
     void handleApplyAccount();
+    void handleCheckStatus();
 
 public:
     explicit ATMController(BankSystem* bankSystem);

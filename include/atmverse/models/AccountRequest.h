@@ -23,6 +23,8 @@ private:
     std::string accountType_; // "Savings" or "Current"
     RequestStatus status_;
     std::string timestamp_;
+    std::string assignedCardNumber_;
+    std::string assignedAccountNumber_;
 
 public:
     AccountRequest() = default;
@@ -42,9 +44,13 @@ public:
     const std::string& getAccountType() const { return accountType_; }
     RequestStatus getStatus() const { return status_; }
     const std::string& getTimestamp() const { return timestamp_; }
+    const std::string& getAssignedCardNumber() const { return assignedCardNumber_; }
+    const std::string& getAssignedAccountNumber() const { return assignedAccountNumber_; }
 
     // Setters
     void setStatus(RequestStatus s) { status_ = s; }
+    void setAssignedCardNumber(const std::string& cardNum) { assignedCardNumber_ = cardNum; }
+    void setAssignedAccountNumber(const std::string& accNum) { assignedAccountNumber_ = accNum; }
 
     // Serialization
     json toJson() const;

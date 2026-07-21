@@ -28,6 +28,7 @@ enum class ScreenState {
     ADMIN_USER_SEARCH,
     ADMIN_LOGS,
     APPLY_ACCOUNT,
+    CHECK_STATUS,
     LOGOUT,
     EXIT
 };
@@ -66,6 +67,7 @@ public:
 
     // Account Creation
     void renderApplyAccount();
+    void renderCheckStatus();
 };
 
 } // namespace atmverse

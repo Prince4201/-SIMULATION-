@@ -93,6 +93,7 @@ public:
     std::vector<AccountRequest> getPendingRequests() const;
     bool approveRequest(const std::string& requestId);
     bool rejectRequest(const std::string& requestId);
+    AccountRequest* checkRequestStatus(const std::string& query);
     std::vector<AccountRequest>& getAccountRequestsRef() { return accountRequests_; }
 };
 
