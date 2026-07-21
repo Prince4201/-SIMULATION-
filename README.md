@@ -1,4 +1,4 @@
-# ATMVerse 🏧
+# ATMVerse 🏧 simulation
 
 **ATMVerse** is a production-quality, immersive ATM and Banking Simulation System built entirely in C++17. It features a stunning ANSI terminal UI, advanced object-oriented architecture, and robust JSON-based data persistence.
 
