@@ -24,6 +24,10 @@ enum class ScreenState {
     ADMIN_DASHBOARD,
     ADMIN_REPORTS,
     ADMIN_CASH,
+    ADMIN_APPROVE_ACCOUNTS,
+    ADMIN_USER_SEARCH,
+    ADMIN_LOGS,
+    APPLY_ACCOUNT,
     LOGOUT,
     EXIT
 };
@@ -56,6 +60,12 @@ public:
     int renderAdminDashboard();
     void renderAdminReports();
     void renderAdminCash();
+    void renderAdminApproveAccounts();
+    void renderAdminUserSearch();
+    void renderAdminLogs();
+
+    // Account Creation
+    void renderApplyAccount();
 };
 
 } // namespace atmverse

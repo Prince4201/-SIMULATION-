@@ -10,6 +10,7 @@
 #include "atmverse/core/Logger.h"
 #include "atmverse/core/AuthManager.h"
 #include "atmverse/core/ReportGenerator.h"
+#include "atmverse/models/AccountRequest.h"
 
 namespace atmverse {
 
@@ -28,6 +29,7 @@ private:
     std::unordered_map<std::string, int> accountIndex_;  // accNum -> index
     std::set<std::string> usedCardNumbers_;
     std::set<std::string> usedAccountNumbers_;
+    std::vector<AccountRequest> accountRequests_;
 
     json settings_;
 
@@ -83,6 +85,15 @@ public:
     const json& getSettings() const { return settings_; }
     std::string getBankName() const;
     int getTotalCustomers() const { return static_cast<int>(customers_.size()); }
+
+    // Account Request Management
+    bool submitAccountRequest(const std::string& name, const std::string& phone,
+                              const std::string& email, const std::string& pin,
+                              const std::string& accountType);
+    std::vector<AccountRequest> getPendingRequests() const;
+    bool approveRequest(const std::string& requestId);
+    bool rejectRequest(const std::string& requestId);
+    std::vector<AccountRequest>& getAccountRequestsRef() { return accountRequests_; }
 };
 
 } // namespace atmverse

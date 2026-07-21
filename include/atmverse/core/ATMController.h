@@ -33,8 +33,13 @@ private:
     void handleDeposit();
     void handleTransfer();
     void handleCardSettings();
+    // Admin handlers
     void handleAdminLogin();
     void handleAdminDashboard();
+    void handleAdminApproveAccounts();
+    void handleAdminUserSearch();
+    void handleAdminLogs();
+    void handleApplyAccount();
 
 public:
     explicit ATMController(BankSystem* bankSystem);

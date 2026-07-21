@@ -146,6 +146,28 @@ bool JSONManager::saveAdmins(const std::vector<Admin>& admins) const {
     return writeFile("admins.json", j);
 }
 
+// ─── Account Requests ────────────────────────────────────────
+std::vector<AccountRequest> JSONManager::loadAccountRequests() const {
+    json j = readFile("account_requests.json");
+    std::vector<AccountRequest> requests;
+    if (j.is_array()) {
+        for (const auto& item : j) {
+            AccountRequest req;
+            req.fromJson(item);
+            requests.push_back(req);
+        }
+    }
+    return requests;
+}
+
+bool JSONManager::saveAccountRequests(const std::vector<AccountRequest>& requests) const {
+    json j = json::array();
+    for (const auto& r : requests) {
+        j.push_back(r.toJson());
+    }
+    return writeFile("account_requests.json", j);
+}
+
 // ─── ATM Cash ────────────────────────────────────────────────
 json JSONManager::loadATMCash() const {
     return readFile("atm_cash.json");

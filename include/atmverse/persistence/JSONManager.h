@@ -5,6 +5,7 @@
 #include "json.hpp"
 #include "atmverse/models/Customer.h"
 #include "atmverse/models/Admin.h"
+#include "atmverse/models/AccountRequest.h"
 
 namespace atmverse {
 
@@ -34,6 +35,10 @@ public:
     // Admin operations
     std::vector<Admin> loadAdmins() const;
     bool saveAdmins(const std::vector<Admin>& admins) const;
+
+    // Account Requests
+    std::vector<AccountRequest> loadAccountRequests() const;
+    bool saveAccountRequests(const std::vector<AccountRequest>& requests) const;
 
     // ATM Cash
     json loadATMCash() const;

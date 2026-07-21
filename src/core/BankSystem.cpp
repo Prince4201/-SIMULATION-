@@ -29,12 +29,14 @@ void BankSystem::initialize() {
 void BankSystem::loadAll() {
     customers_ = jsonManager_.loadCustomers();
     admins_ = jsonManager_.loadAdmins();
+    accountRequests_ = jsonManager_.loadAccountRequests();
     buildIndices();
 }
 
 void BankSystem::saveAll() {
     jsonManager_.saveCustomers(customers_);
     jsonManager_.saveAdmins(admins_);
+    jsonManager_.saveAccountRequests(accountRequests_);
     cashDispenser_.saveToJson();
 }
 
@@ -295,4 +297,90 @@ std::string BankSystem::getBankName() const {
     return settings_.value("bankName", "ATMVerse Bank");
 }
 
+// ─── Account Request Management ──────────────────────────────
+bool BankSystem::submitAccountRequest(const std::string& name, const std::string& phone,
+                                       const std::string& email, const std::string& pin,
+                                       const std::string& accountType)
+{
+    std::string reqId = "REQ" + util::randomDigits(6);
+    std::string salt = util::generateSalt();
+    std::string pinHash = util::hashPin(pin, salt);
+    std::string timestamp = util::getCurrentDateTime();
+
+    AccountRequest req(reqId, name, phone, email, pinHash, salt,
+                       accountType, RequestStatus::PENDING, timestamp);
+    accountRequests_.push_back(req);
+    jsonManager_.saveAccountRequests(accountRequests_);
+    logger_.log(LogEventType::SYSTEM_START, reqId, "Account request submitted: " + name);
+    return true;
+}
+
+std::vector<AccountRequest> BankSystem::getPendingRequests() const {
+    std::vector<AccountRequest> pending;
+    for (const auto& req : accountRequests_) {
+        if (req.getStatus() == RequestStatus::PENDING) {
+            pending.push_back(req);
+        }
+    }
+    return pending;
+}
+
+bool BankSystem::approveRequest(const std::string& requestId) {
+    for (auto& req : accountRequests_) {
+        if (req.getRequestId() == requestId && req.getStatus() == RequestStatus::PENDING) {
+            req.setStatus(RequestStatus::APPROVED);
+
+            // Determine AccountType enum
+            AccountType accType = AccountType::SAVINGS;
+            if (req.getAccountType() == "Current") {
+                accType = AccountType::CURRENT;
+            }
+
+            // Generate unique identifiers
+            std::string accNum;
+            do {
+                accNum = util::generateAccountNumber();
+            } while (usedAccountNumbers_.count(accNum));
+
+            std::string cardNum;
+            do {
+                cardNum = util::generateCardNumber();
+            } while (usedCardNumbers_.count(cardNum));
+
+            std::string cvv = util::generateCVV();
+            std::string expiry = util::generateExpiryDate();
+            std::string custId = "CUS" + util::randomDigits(5);
+            CardType cardType = (util::randomInt(0, 1) == 0) ? CardType::VISA : CardType::MASTERCARD;
+
+            Account account(accNum, 0.0, accType);
+            Card card(cardNum, cvv, expiry, req.getPinHash(), req.getPinSalt(),
+                      accNum, req.getName(), cardType);
+            Customer customer(custId, req.getName(), req.getPhone(), req.getEmail(),
+                              account, card);
+
+            customers_.push_back(customer);
+            buildIndices();
+            saveAll();
+
+            logger_.log(LogEventType::ACCOUNT_CREATE, custId,
+                       "Account approved: " + accNum + " Card: " + cardNum);
+            return true;
+        }
+    }
+    return false;
+}
+
+bool BankSystem::rejectRequest(const std::string& requestId) {
+    for (auto& req : accountRequests_) {
+        if (req.getRequestId() == requestId && req.getStatus() == RequestStatus::PENDING) {
+            req.setStatus(RequestStatus::REJECTED);
+            jsonManager_.saveAccountRequests(accountRequests_);
+            logger_.log(LogEventType::SYSTEM_START, requestId, "Account request rejected");
+            return true;
+        }
+    }
+    return false;
+}
+
 } // namespace atmverse
+

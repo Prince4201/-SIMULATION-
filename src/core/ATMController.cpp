@@ -104,6 +104,18 @@ void ATMController::run() {
             case ScreenState::ADMIN_DASHBOARD:
                 handleAdminDashboard();
                 break;
+            case ScreenState::APPLY_ACCOUNT:
+                handleApplyAccount();
+                break;
+            case ScreenState::ADMIN_APPROVE_ACCOUNTS:
+                handleAdminApproveAccounts();
+                break;
+            case ScreenState::ADMIN_USER_SEARCH:
+                handleAdminUserSearch();
+                break;
+            case ScreenState::ADMIN_LOGS:
+                handleAdminLogs();
+                break;
             case ScreenState::LOGOUT:
                 Animations::cardEjectAnimation();
                 TerminalUI::showSuccess("Logged out successfully");
@@ -131,6 +143,8 @@ void ATMController::handleWelcome() {
     char ch = TerminalUI::getKeyPress();
     if (ch == 'a' || ch == 'A') {
         changeState(ScreenState::ADMIN_LOGIN);
+    } else if (ch == 'c' || ch == 'C') {
+        changeState(ScreenState::APPLY_ACCOUNT);
     } else if (ch == 'q' || ch == 'Q') {
         changeState(ScreenState::EXIT); // Hidden exit for testing
     } else {
@@ -355,18 +369,38 @@ void ATMController::handleAdminDashboard() {
             screenManager_.renderAdminCash();
             break;
         case 3:
-            TerminalUI::showInfo("Search coming soon");
+            changeState(ScreenState::ADMIN_USER_SEARCH);
             break;
         case 4:
-            TerminalUI::showInfo("Logs coming soon");
+            changeState(ScreenState::ADMIN_LOGS);
             break;
         case 5:
-            TerminalUI::showInfo("Creation restricted to web portal");
+            changeState(ScreenState::ADMIN_APPROVE_ACCOUNTS);
             break;
         case 0:
             changeState(ScreenState::LOGOUT);
             break;
     }
+}
+
+void ATMController::handleApplyAccount() {
+    screenManager_.renderApplyAccount();
+    changeState(ScreenState::WELCOME);
+}
+
+void ATMController::handleAdminApproveAccounts() {
+    screenManager_.renderAdminApproveAccounts();
+    changeState(ScreenState::ADMIN_DASHBOARD);
+}
+
+void ATMController::handleAdminUserSearch() {
+    screenManager_.renderAdminUserSearch();
+    changeState(ScreenState::ADMIN_DASHBOARD);
+}
+
+void ATMController::handleAdminLogs() {
+    screenManager_.renderAdminLogs();
+    changeState(ScreenState::ADMIN_DASHBOARD);
 }
 
 } // namespace atmverse
