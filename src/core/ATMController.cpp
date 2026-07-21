@@ -143,17 +143,25 @@ void ATMController::run() {
 
 void ATMController::handleWelcome() {
     screenManager_.renderWelcome();
-    char ch = TerminalUI::getKeyPress();
-    if (ch == 'a' || ch == 'A') {
-        changeState(ScreenState::ADMIN_LOGIN);
-    } else if (ch == '2' || ch == 'c' || ch == 'C') {
-        changeState(ScreenState::APPLY_ACCOUNT);
-    } else if (ch == '3' || ch == 's' || ch == 'S') {
-        changeState(ScreenState::CHECK_STATUS);
-    } else if (ch == 'q' || ch == 'Q' || ch == '0') {
-        changeState(ScreenState::EXIT);
-    } else {
-        changeState(ScreenState::INSERT_CARD);
+    
+    while (true) {
+        char ch = TerminalUI::getKeyPress();
+        if (ch == 'a' || ch == 'A') {
+            changeState(ScreenState::ADMIN_LOGIN);
+            break;
+        } else if (ch == '2' || ch == 'c' || ch == 'C') {
+            changeState(ScreenState::APPLY_ACCOUNT);
+            break;
+        } else if (ch == '3' || ch == 's' || ch == 'S') {
+            changeState(ScreenState::CHECK_STATUS);
+            break;
+        } else if (ch == 'q' || ch == 'Q' || ch == '0') {
+            changeState(ScreenState::EXIT);
+            break;
+        } else if (ch == '1' || ch == 'i' || ch == 'I') {
+            changeState(ScreenState::INSERT_CARD);
+            break;
+        }
     }
 }
 
